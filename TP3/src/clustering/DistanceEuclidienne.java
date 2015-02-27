@@ -20,9 +20,9 @@ public class DistanceEuclidienne implements Distance {
 			
 			diff = d1.valeurDim(i)-d2.valeurDim(i);
 			
-			Math.pow(diff, 2);
+			
 		
-			sum+=diff;
+			sum+=Math.pow(diff, 2);
 			
 		}
 

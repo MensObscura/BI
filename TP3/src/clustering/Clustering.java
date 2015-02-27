@@ -82,32 +82,61 @@ public class Clustering{
   
     // on choisit (pseudo-)aléatoirement k centres pour commencer l'algo.
     private void choisirCentres(){
-        // A COMPLETER
+    	System.out.println("Les centres de bases sont : \n");
+		boolean[] dejaTire = new boolean[lesDonnees.size()];
+		for (int i = 0; i < dejaTire.length; i++)
+			dejaTire[i] = false;
+		for (int i = 0; i < k; i++) {
+			System.out.println(lesDonnees.size() - 1);
+			int tirage = hasard.nextInt(lesDonnees.size() - 1);
+		
+			while (dejaTire[tirage]) {
+				tirage = hasard.nextInt(lesDonnees.size() - 1);
+			}
+			dejaTire[tirage] = true;
+			lesCentres[i] = lesDonnees.get(tirage);
+			System.out.println("Centre tire parmi les points :"+ lesDonnees.get(tirage));
+		}
     }
   
     // on change les centres en prenant les barycentres des clusters.
     // à faire après chaque étape
     private void nouveauxCentres(){
-        // A COMPLETER
+    	for (int i = 0; i < lesCentres.length; i++)
+			lesCentres[i] = lesClusters[i].moyenne();
     }
   
     // une étape : on calcule la distance de chaque donnée par rapport aux centres des clusters
     // et on place chaque donnée dans le cluster dont le centre est le plus proche
     private boolean etape(){
-        boolean change = false ;
-        // A COMPLETER
-        return change ; // renvoie true ssi au moins une donnee a change de cluster
+    	boolean change = false;
+		for (Donnee temp : lesDonnees) {
+			for (int j = 0; j < lesCentres.length; j++) {
+				temp.evalueChangementCluster(lesCentres[j], j, lesClusters,
+						distance);
+				change = temp.aChangeDeCluster();
+				if (change) {
+					nouveauxCentres();
+				}
+			}
+		}
+
+		return change; // renvoie true ssi au moins une donnee a change de
+						// cluster
     }
 
     /**
      * renvoie la compacité des clusters, c'est à dire la somme des compacités de tous les clusters (WC vient de "within clusters").
      * La compacité d'un cluster est la somme des distances des données du cluster par rapport à son centre.
      * @return la compacité des k clusters
+     * @throws ClusterException 
      */
-    public double wc() {
-        double som = 0.0 ;
-        // A COMPLETER
-        return som ;
+    public double wc() throws ClusterException {
+    	double som = 0.0;
+		for (int i = 0; i < lesClusters.length; i++) {
+			som += lesClusters[i].wc();
+		}
+		return som;
     }
 
     /**
@@ -125,8 +154,9 @@ public class Clustering{
      * On applique l'algo des k-means
      * @param trace boolean qui permet de demander (ou pas) d'avoir une trace des étapes de l'algorithme. A eviter s'il y a beaucoup de données !
      * @return le tableau des k Clusters résultat de l'application de l'algorithme.
+     * @throws ClusterException 
      */
-    public Cluster[] algo(boolean trace){
+    public Cluster[] algo(boolean trace) throws ClusterException{
         boolean change = true ;
         if (trace) {
             System.out.println("données avant le clustering : "); 
@@ -134,15 +164,15 @@ public class Clustering{
             System.out.println("Application du clustering : "); 
         }
         while (change) {
-            // l'instruction ci-dessous est A REMPLACER par l'algo
-            change=false ;
+        	change = etape();
+			this.affichage();
         }
         return this.lesClusters ;
     }
 
     // affiche toutes les données avec leur numéro de cluster et la distance par rapport au centre
     // donne aussi un résumé des mesures de qualité : WC et BC
-    private void affichage(){
+    private void affichage() throws ClusterException{
         System.out.println("--------------------");
         for (Donnee d : this.lesDonnees) {
             System.out.println(d.toComplexString());

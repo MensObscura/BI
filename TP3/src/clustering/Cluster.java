@@ -57,7 +57,6 @@ public class Cluster implements java.lang.Iterable<Donnee>{
 		if (this.dimDonnee != d.nbDimensions()) throw new ClusterException("les donnees doivent avoir toutes la même dimension");
 		this.data.add(d) ;
 		this.nb++ ;
-
 		for (int i=0 ; i<this.dimDonnee ; i++){
 			double vali = d.valeurDim(i) ;
 			if(this.premiereDonnee){
@@ -172,8 +171,9 @@ public class Cluster implements java.lang.Iterable<Donnee>{
 	/**
 	 * La compacité WC = somme pour toutes les données d de la distance de d au barycentre du cluster.
 	 * @return la compacité WC du cluster
+	 * @throws ClusterException 
 	 */
-	public double wc(){
+	public double wc() throws ClusterException{
 		 double som = 0.0 ;
 	        Donnee bary = new Donnee(this.moy);
 	        DistanceEuclidienne dist = new DistanceEuclidienne();
@@ -182,6 +182,11 @@ public class Cluster implements java.lang.Iterable<Donnee>{
 	        	som += dist.valeur(d, bary);
 	        
 	        return som ;
+		
+//	        for(Donnee d : data){
+//				  som += d.distanceCentre();
+//			  }
+//	        return som ;
 	}
 
 	/**
