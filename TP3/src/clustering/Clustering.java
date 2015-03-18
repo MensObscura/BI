@@ -129,7 +129,7 @@ public class Clustering{
      * renvoie la compacité des clusters, c'est à dire la somme des compacités de tous les clusters (WC vient de "within clusters").
      * La compacité d'un cluster est la somme des distances des données du cluster par rapport à son centre.
      * @return la compacité des k clusters
-     * @throws ClusterException 
+     * @throws ClusterException Cluster[]
      */
     public double wc() throws ClusterException {
     	double som = 0.0;
@@ -142,10 +142,14 @@ public class Clustering{
     /**
      * renvoie la séparation, c'est à dire la somme des distances entre les centres des clusters (BC vient de "between clusters").
      * @return la séparation des clusters
+     * @throws ClusterException 
      */
-    public double bc(){
+    public double bc() throws ClusterException{
         double som = 0.0 ;
-        // A COMPLETER
+        for(int i = 0; i <lesClusters.length; i++){
+    		som+=lesClusters[i].wc();
+    		
+    	}
         return som ;
     }
   
@@ -163,13 +167,22 @@ public class Clustering{
             this.affichage() ;
             System.out.println("Application du clustering : "); 
         }
-        while (change) {
+        while (clusterEmpty()) {
         	change = etape();
 			this.affichage();
         }
         return this.lesClusters ;
     }
 
+    
+    public boolean clusterEmpty(){
+    	for(int i = 0; i <lesClusters.length; i++){
+    		if(lesClusters[i].size() == 0){
+    			return true;
+    		}
+    	}
+    	return false;
+    }
     // affiche toutes les données avec leur numéro de cluster et la distance par rapport au centre
     // donne aussi un résumé des mesures de qualité : WC et BC
     private void affichage() throws ClusterException{
