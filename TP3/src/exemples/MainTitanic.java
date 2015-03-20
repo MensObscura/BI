@@ -105,7 +105,6 @@ public class MainTitanic{
             Cluster lesDonnees = lireFichier(argv[0]) ;
             int k = Integer.parseInt(argv[1]) ;
             System.out.println("nombre de données lues : "+lesDonnees.size());
-            // essayer avec différentes distances
             Distance dist = new DistanceEuclidienne() ;
             Clustering cl = new Clustering(k, lesDonnees, dist);
             Cluster[] lesClusters = cl.algo(false) ;

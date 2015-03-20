@@ -83,7 +83,6 @@ public class Clustering{
   
     // on choisit (pseudo-)aléatoirement k centres pour commencer l'algo.
     private void choisirCentres(){
-        // FAIT
     	Donnee min = this.lesDonnees.min();
 		Donnee max = this.lesDonnees.max();
 		int nbDim = this.lesDonnees.nbDimensions();
@@ -137,7 +136,6 @@ public class Clustering{
      * @return la compacité des k clusters
      */
     public double wc() {
-        // FAIT
     	double som = 0.0;
         for(int i = 0 ;i < k; i++){
 			int size = lesClusters[i].size();
