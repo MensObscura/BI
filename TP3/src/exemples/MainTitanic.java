@@ -3,7 +3,7 @@ import clustering.*;
 
 import java.io.*;
 
-public class MainsTitanic{
+public class MainTitanic{
   
     private static double[] array(double sl, double sw, double pl, double pw){
         double[] t = {sl,sw,pl,pw};
@@ -15,6 +15,7 @@ public class MainsTitanic{
         String[] ligneCoupee ;
         Cluster data = new Cluster(4) ;
         BufferedReader ficTexte;
+        double[] ligneData = new double [4];
         try {
             ficTexte = new BufferedReader(new FileReader(new File(fichier)));
             if (ficTexte == null) {
@@ -26,11 +27,34 @@ public class MainsTitanic{
                     System.out.println(ligne);
                     if (ligne.charAt(0) != '@' && ligne.charAt(0) != '%'){
                         ligneCoupee = ligne.split(",");
-                        data.add(new DonneeIris(array(Double.parseDouble(ligneCoupee[0]),
-                                                      Double.parseDouble(ligneCoupee[1]),
-                                                      Double.parseDouble(ligneCoupee[2]),
-                                                      Double.parseDouble(ligneCoupee[3])),
-                                                ligneCoupee[4]));
+                        
+                        switch(ligneCoupee[0]){
+                        case "1st" : ligneData[0] = 1.0; break;
+                        case "2nd" : ligneData[0] = 2.0; break;
+                        case "3nd" : ligneData[0] = 3.0; break;
+                        case "crew" : ligneData[0] = 0.0; break;
+                        }
+                        
+                        switch(ligneCoupee[1]){
+                        case "adult" : ligneData[1] = 1.0; break;
+                        case "child" : ligneData[1] = 0.0; break;
+                        }
+                        
+                        switch(ligneCoupee[2]){
+                        case "male" : ligneData[2] = 1.0; break;
+                        case "female" : ligneData[2] = 0.0; break;
+                        }
+                        
+                        switch(ligneCoupee[3]){
+                        case "no" : ligneData[3] = 0.0; break;
+                        case "yes" : ligneData[3] = 1.0; break;
+                        }
+                        
+                                            
+                        
+                        
+                        
+                        data.add(new DonneeIris(ligneData,ligneCoupee[3]));
                     }
                 }
             } while (ligne != null);
@@ -51,7 +75,7 @@ public class MainsTitanic{
         try{
             BufferedWriter ficTexte = new BufferedWriter(new FileWriter(cheminFichier, false));
             for (Donnee d : cl){
-                ficTexte.write(d.valeurDim(0)+" "+d.valeurDim(1)+" "+d.valeurDim(2)+" "+d.valeurDim(3)+"\n");
+                ficTexte.write(d.valeurDim(0)+" "+d.valeurDim(1)+" "+d.valeurDim(2)+"\n");
             }
             ficTexte.flush();				
             ficTexte.close();
@@ -63,22 +87,20 @@ public class MainsTitanic{
     }
 
     private static void afficheDetail(int i, Cluster cl){
-        int nbSetosa = 0 ;
-        int nbVersicolor = 0 ;
-        int nbVirginica = 0 ;
+        int nbmort = 0 ;
+        int nbvivant = 0 ;
         System.out.println("le cluster "+i+" a "+cl.size()+" donnees et son centre est "+ cl.moyenne());
         for (Donnee d : cl){
-            if (((DonneeIris) d).nom().equals("Iris-setosa")) nbSetosa ++ ;
-            else if (((DonneeIris) d).nom().equals("Iris-versicolor")) nbVersicolor++ ;
-            else nbVirginica++ ;
+            if (((DonneeIris) d).nom().equals("no")) nbmort ++ ;
+            else nbvivant++ ;
         }
-        System.out.println("--> Détail : "+nbSetosa+" iris setosa, "+nbVersicolor+" iris versicolor, "+nbVirginica+" iris virginica");
+        System.out.println("--> Détail : "+nbmort+" morts, "+nbvivant+" vivants");
     }
   
    public static void main(String argv[]) throws ClusterException {
         if (argv.length < 2) {
             System.out.println("il faut deux parametres, le fichier et le nombre de clusters.");
-            System.out.println("Par exemple : java -cp ./classes exemples.MainIris iris.arff 3") ;
+            System.out.println("Par exemple : java -cp ./classes exemples.MainTitanic titanic.arff 3") ;
         }else {
             Cluster lesDonnees = lireFichier(argv[0]) ;
             int k = Integer.parseInt(argv[1]) ;

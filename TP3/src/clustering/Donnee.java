@@ -111,5 +111,10 @@ public class Donnee{
         String s="("+this.toString()+") k="+this.cluster+ " dist="+this.distanceCentre;
         return s;
     }
+
+	public double[] getValeurs() {
+		
+		return this.valeurs;
+	}
   
 }

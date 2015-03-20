@@ -57,18 +57,26 @@ public class Cluster implements java.lang.Iterable<Donnee>{
 		if (this.dimDonnee != d.nbDimensions()) throw new ClusterException("les donnees doivent avoir toutes la même dimension");
 		this.data.add(d) ;
 		this.nb++ ;
-		for (int i=0 ; i<this.dimDonnee ; i++){
-			double vali = d.valeurDim(i) ;
-			if(this.premiereDonnee){
-				this.max[i]=vali;
-				this.min[i]=vali;
+		
+		// FAIT : l'actualisation des tableaux min, max, somme et moy
+		for (int i = 0 ; i < this.dimDonnee ; i++){
+			double vali = d.valeurDim(i);
+			
+			if (this.premiereDonnee) {
+				this.min[i] = vali;
+				this.max[i] = vali;
 			}
-			if (vali < min[i] || vali > this.max[i]) calculMinMax(i) ;
+				
+			this.calculMinMax(i) ;
 			this.somme[i] += vali ;
-			this.moy[i] = this.somme[i]/nb;
+			this.moy[i] = this.somme[i]/this.nb;
 		}
+		
+		if (this.premiereDonnee) {
+			this.premiereDonnee = false;
+		}
+		
 		this.ok = false ; // il faudra (re)calculer les ecarts types
-		this.premiereDonnee = false ;
 	}
 
 	/**
@@ -104,12 +112,15 @@ public class Cluster implements java.lang.Iterable<Donnee>{
 		}
 	}
 
-	// recherche la plus petite et la plus grande valeur de chaque dimension pour l'ensemble des données 
+	/**
+	 * recherche la plus petite et la plus grande valeur de chaque dimension pour l'ensemble des données 
+	 * @param i la dimension
+	 */
 	private void calculMinMax(int i){
 		for (Donnee d : this.data){
 			double vali = d.valeurDim(i) ;
-			if (vali < min[i]) this.min[i]=vali ;
-			if (vali > max[i]) this.max[i]=vali ;
+			if (vali < min[i]) this.min[i]=vali;
+			if (vali > max[i]) this.max[i]=vali;
 		}
 	}
 
@@ -141,31 +152,22 @@ public class Cluster implements java.lang.Iterable<Donnee>{
 	 * renvoie les écarts types pour toutes les dimensions.
 	 * @return une donnée constitutée des ecarts types pour toutes les dimensions
 	 */
-
-	public void calcEcartType(){
-
-		if (! ok){
-
-			double total=0, ecart, variance;
-
-			for(int j=0; j < this.dimDonnee; j++){
-				for(int i=0; i < this.nb ; i++){
-					ecart =this.data.get(i).valeurDim(j) -moy[j];
-					total = total + ecart*ecart;
-				} 
-
-				variance = total / (this.nb);
-
-				sd[j]=Math.sqrt(variance);
-			}
+	public Donnee ecartType(){
+		if (!this.ok){
+			// FAIT !
+			for (int i=0 ; i<this.dimDonnee ; i++){
+				double tmp = 0.0;
+				for (Donnee d : this.data){
+					double vali = d.valeurDim(i) ;
+					tmp += Math.pow((vali - this.moy[i]),2);
+				}
+				tmp = tmp/this.size();
+				tmp = Math.sqrt(tmp);
+				this.sd[i] = tmp;
+			}			
 		}
 		this.ok = true ;
-
-	}
-
-	public Donnee ecartType(){
-		calcEcartType();
-		return new Donnee(sd);
+		return new Donnee(this.sd);
 	}
 
 	/**
@@ -174,19 +176,13 @@ public class Cluster implements java.lang.Iterable<Donnee>{
 	 * @throws ClusterException 
 	 */
 	public double wc() throws ClusterException{
-		 double som = 0.0 ;
-	        Donnee bary = new Donnee(this.moy);
-	        DistanceEuclidienne dist = new DistanceEuclidienne();
-	       
-	        for (Donnee d : this.data)
-	        	som += dist.valeur(d, bary);
-	        
-	        return som ;
+		double som = 0.0 ;
 		
-//	        for(Donnee d : data){
-//				  som += d.distanceCentre();
-//			  }
-//	        return som ;
+		// FAIT
+		for (Donnee d : this.data)
+			som += d.distanceCentre();
+		
+		return som ;
 	}
 
 	/**
